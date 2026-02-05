@@ -95,6 +95,7 @@ The following wake words are supported in esp-sr:
 |嗨小欧           |                                  | wn9_hai1xiao3ou1_tts3|
 |小珈小珈         |                                  | wn9_xiao3jia1xiao3jia1_tts3|
 |小峰小峰         |                                  | wn9_xiao3feng1xiao3feng1_tts3|
+|嗨小象           |                                  | wn9_hai1xiao3xiang4_tts3|
 
 **NOTE**:
 

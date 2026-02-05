@@ -296,6 +296,11 @@ menu "Load Multiple Wake Words (WakeNet9)"
     config SR_WN_WN9_XIAO3FENG1XIAO3FENG1_TTS3
     bool "小峰小峰 (wn9_xiao3feng1xiao3feng1_tts3)"
     default False
+
+
+    config SR_WN_WN9_HAI1XIAO3XIANG4_TTS3
+    bool "嗨小象 (wn9_hai1xiao3xiang4_tts3)"
+    default False
 endmenu
 
 
