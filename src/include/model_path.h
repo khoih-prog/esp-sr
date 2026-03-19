@@ -129,7 +129,20 @@ srmodel_list_t *get_static_srmodels(void);
  */
 srmodel_list_t *srmodel_load(const void *root);
 
+/**
+ * @brief Initialize and load model from binary file in host.
+ * 
+ * @param filename    The binary model file name.
+ */
+srmodel_list_t *srmodel_host_init(const char* filename);
 
+
+/**
+ * @brief Deinitialize the model list loaded by srmodel_load function.
+ * 
+ * @param models    The srmodel_list_t point allocated by srmodel_load function.
+ */
+void srmodel_host_deinit(srmodel_list_t *models);
 
 #ifdef ESP_PLATFORM
 #include "dl_lib_coefgetter_if.h"
