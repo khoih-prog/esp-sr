@@ -1,5 +1,10 @@
 # Change log for esp-sr
 
+# 2.4.0
+- add more wakenet models
+- add an afe option to fix output channel
+- fix some afe bugs
+
 # 2.3.0
 - Upgrade esp-dsp to v1.7.0
 - Fix mn5q8 crash
