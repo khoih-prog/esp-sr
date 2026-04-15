@@ -18,7 +18,6 @@
 #include "dl_lib_matrixq.h"
 #include "dl_lib_matrixq8.h"
 #include "cJSON.h"
-// #include "cjson/cJSON.h"
 
 #ifdef __cplusplus
 extern "C" {

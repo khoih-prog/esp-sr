@@ -68,6 +68,12 @@ def get_cmake_apps(
     )
     return apps
 
+def remove_esp32p4_v1_on_idf6(apps):
+    idf_ver = _get_idf_version()
+    if idf_ver.startswith('6.'):
+        apps = [app for app in apps if "sdkconfig.ci.p4v1_" not in app.sdkconfig_path]
+    return apps
+
 
 def main(args):  # type: (argparse.Namespace) -> None
     default_build_targets = args.default_build_targets.split(',') if args.default_build_targets else None
@@ -77,12 +83,14 @@ def main(args):  # type: (argparse.Namespace) -> None
         apps_to_build = [app for app in apps if app.name not in args.exclude_apps]
     else:
         apps_to_build = apps[:]
+    apps_to_build = remove_esp32p4_v1_on_idf6(apps_to_build)
 
     LOGGER.info('Found %d apps after filtering', len(apps_to_build))
     LOGGER.info(
         'Suggest setting the parallel count to %d for this build job',
         len(apps_to_build) // APPS_BUILD_PER_JOB + 1,
     )
+    print('Apps to build:', [app.name for app in apps_to_build])
 
     ret_code = build_apps(
         apps_to_build,
