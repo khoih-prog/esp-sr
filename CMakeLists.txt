@@ -1,11 +1,11 @@
 if((${IDF_TARGET} STREQUAL "esp32s3") OR (${IDF_TARGET} STREQUAL "esp32p4") OR (${IDF_TARGET} STREQUAL "esp32") OR (${IDF_TARGET} STREQUAL "esp32c3") OR (${IDF_TARGET} STREQUAL "esp32c5") OR (${IDF_TARGET} STREQUAL "esp32c6") OR  (${IDF_TARGET} STREQUAL "esp32s2"))
     set(TARGET_LIB_PATH "${IDF_TARGET}")
     
-    if (${IDF_TARGET} STREQUAL "esp32p4" AND (IDF_VERSION_MAJOR GREATER_EQUAL 5) AND (IDF_VERSION_MINOR GREATER_EQUAL 5))
-        if (NOT CONFIG_ESP32P4_SELECTS_REV_LESS_V3)
-            set(TARGET_LIB_PATH "esp32p4_eco5")
-        endif()
+    if(CONFIG_IDF_TARGET_ESP32P4 AND CONFIG_ESP32P4_SELECTS_REV_LESS_V3)
+        set(TARGET_LIB_PATH "esp32p4_less_v3")
     endif()
+
+    message(STATUS "TARGET_LIB_PATH is set to: ${TARGET_LIB_PATH}")
 
     set(include_dirs
         "esp-tts/esp_tts_chinese/include"
@@ -21,8 +21,8 @@ if((${IDF_TARGET} STREQUAL "esp32s3") OR (${IDF_TARGET} STREQUAL "esp32p4") OR (
         )
 
     set(requires
-        json
         spiffs
+        cjson
         )
 
     IF (IDF_VERSION_MAJOR GREATER 4)
@@ -51,10 +51,12 @@ if((${IDF_TARGET} STREQUAL "esp32s3") OR (${IDF_TARGET} STREQUAL "esp32p4") OR (
     add_prebuilt_library(nsnet "${CMAKE_CURRENT_SOURCE_DIR}/lib/${TARGET_LIB_PATH}/libnsnet.a" PRIV_REQUIRES ${COMPONENT_NAME})
     idf_component_get_property(esp_dsp_lib espressif__esp-dsp COMPONENT_LIB)
     idf_component_get_property(dl_fft_lib espressif__dl_fft COMPONENT_LIB)
+    idf_component_get_property(cjson_lib espressif__cjson COMPONENT_LIB)
 
     set(sr_libs 
         $<TARGET_FILE:${esp_dsp_lib}>
         $<TARGET_FILE:${dl_fft_lib}>
+        $<TARGET_FILE:${cjson_lib}>
         dl_lib
         c_speech_features
         esp_audio_front_end

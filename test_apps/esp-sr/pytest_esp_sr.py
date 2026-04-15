@@ -24,6 +24,8 @@ def test_multinet_s3(dut: Dut)-> None:
     [
         'p4_mn7_en',
         'p4_mn7_cn',
+        'p4_mn7_en_v1',
+        'p4_mn7_cn_v1',        
     ],
 )
 def test_multinet_p4(dut: Dut)-> None:
@@ -47,6 +49,7 @@ def test_wakenet(dut: Dut)-> None:
     'config',
     [
         'p4_wn9_hilexin',
+        'p4_wn9_hilexin_v1',
     ],
 )
 def test_wakenet_p4(dut: Dut)-> None:
@@ -71,6 +74,8 @@ def test_sr_afe(dut: Dut)-> None:
     [
         'p4_afe',
         'p4_wn9_hilexin',
+        'p4_afe_v1',
+        'p4_wn9_hilexin_v1',
     ],
 )
 def test_sr_afe_p4(dut: Dut)-> None:
