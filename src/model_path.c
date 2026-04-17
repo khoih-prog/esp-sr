@@ -22,6 +22,7 @@
 static char *TAG = "MODEL_LOADER";
 static char *SRMODE_BASE_PATH = "/srmodel";
 static srmodel_list_t *static_srmodels = NULL;
+static int srmodel_init_refcount = 0;
 
 void set_model_base_path(const char *base_path)
 {
@@ -511,6 +512,7 @@ void srmodel_sdcard_deinit(srmodel_list_t *models)
 
 srmodel_list_t *esp_srmodel_init(const char *partition_label)
 {
+    srmodel_init_refcount ++;
 #ifdef ESP_PLATFORM
 
 #ifdef CONFIG_MODEL_IN_SDCARD
@@ -543,6 +545,15 @@ void esp_srmodel_deinit(srmodel_list_t *models)
 #else
     return srmodel_sdcard_deinit(models);
 #endif
+}
+
+void esp_srmodel_deinit_with_refcount(srmodel_list_t *models)
+{
+    if (srmodel_init_refcount <= 1) {
+        esp_srmodel_deinit(models);
+    } else if (srmodel_init_refcount > 1) {
+        srmodel_init_refcount--;
+    }
 }
 
 // repackage strstr function to support needle==NULL

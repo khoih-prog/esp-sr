@@ -104,7 +104,7 @@ void test_afe_by_config(afe_config_t *afe_config, int frame_num, int *memory, fl
     TEST_ASSERT_EQUAL(true, mem_leak < 1000 && end_size == first_end_size);
 }
 
-TEST_CASE(">>>>>>>> AFE create/destroy API & memory leak <<<<<<<<", "[afe]")
+TEST_CASE(">>>>>>>> AFE create/destroy API & memory leak <<<<<<<<", "[afe_all]")
 {
     const char *input_format[6] = {"MR", "MMNR"};
     afe_type_t afe_type[2] = {AFE_TYPE_SR, AFE_TYPE_VC};
@@ -157,7 +157,7 @@ TEST_CASE(">>>>>>>> AFE create/destroy API & memory leak <<<<<<<<", "[afe]")
     printf("AFE create/destroy API & memory leak test done\n");
 }
 
-TEST_CASE(">>>>>>>> AFE default setting <<<<<<<<", "[afe_benchmark]")
+TEST_CASE(">>>>>>>> AFE default setting <<<<<<<<", "[afe]")
 {
     const char *input_format[6] = {"MR", "MMNR"};
     afe_type_t afe_type[2] = {AFE_TYPE_SR, AFE_TYPE_VC};

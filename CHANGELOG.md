@@ -1,5 +1,11 @@
 # Change log for esp-sr
 
+# 2.4.1
+- Experimental support esp-idf v6.0
+- Supports both esp32p4 eco6 and old versions.
+- Added a Kconfig option to load data from external path.
+- Print model loading report during compilation
+
 # 2.4.0
 - add more wakenet models
 - add an afe option to fix output channel

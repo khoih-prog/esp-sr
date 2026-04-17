@@ -300,7 +300,6 @@ menu "Load Multiple Wake Words (WakeNet9)"
     bool "小峰小峰 (wn9_xiao3feng1xiao3feng1_tts3)"
     default False
 
-
     config SR_WN_WN9_HAI1XIAO3XIANG4_TTS3
     bool "嗨小象 (wn9_hai1xiao3xiang4_tts3)"
     default False
@@ -1459,12 +1458,12 @@ config EN_SPEECH_COMMAND_ID16
 config EN_SPEECH_COMMAND_ID17
     string "ID17"
     depends on SR_MN_EN_MULTINET5_SINGLE_RECOGNITION_QUANT8
-    default "TkN nN eL jc LiTS"
+    default "TkN nN eL jc list"
 
 config EN_SPEECH_COMMAND_ID18
     string "ID18"
     depends on SR_MN_EN_MULTINET5_SINGLE_RECOGNITION_QUANT8
-    default "TkN eF eL jc LiTS"
+    default "TkN eF eL jc list"
 
 config EN_SPEECH_COMMAND_ID19
     string "ID19"
@@ -2372,5 +2371,9 @@ config EN_SPEECH_COMMAND_ID199
     default ""
 
 endmenu
+
+config ESP_SR_EXTERNAL_MODEL_PATH
+string "Load models from external path"
+default ""
 
 endmenu
