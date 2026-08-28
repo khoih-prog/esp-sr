@@ -264,6 +264,14 @@ Resource Consumption
     | WakeNet9 @ 3   |       |         |                |              |
     | channel        |       |         |                |              |
     +----------------+-------+---------+----------------+--------------+
+    | Quantised      | 16 KB | 148 KB  | 7.1 ms         | 32 ms        |
+    | WakeNet10 @ 3  |       |         |                |              |
+    | channel        |       |         |                |              |
+    +----------------+-------+---------+----------------+--------------+
+
+    .. note::
+
+        WakeNet10 3-channel results use ``DET_MODE_3CH_90`` as the default detection mode. CPU loading (1 core): 22.3%.
 
 .. only:: esp32p4
 
@@ -280,6 +288,32 @@ Resource Consumption
     | WakeNet9 @ 3   |       |         |                |              |
     | channel        |       |         |                |              |
     +----------------+-------+---------+----------------+--------------+
+    | Quantised      | 16 KB | 153 KB  | 4.1 ms         | 32 ms        |
+    | WakeNet10 @ 3  |       |         |                |              |
+    | channel        |       |         |                |              |
+    +----------------+-------+---------+----------------+--------------+
+
+    .. note::
+
+        WakeNet10 3-channel results use ``DET_MODE_3CH_90`` as the default detection mode. CPU loading (1 core): 12.9%.
+
+.. _resource-occupancyesp32s31-1:
+
+.. only:: esp32s31
+
+    +----------------+-------+---------+----------------+--------------+
+    | Model Type     | RAM   | PSRAM   | Average        | Frame Length |
+    |                |       |         | Running Time   |              |
+    |                |       |         | per Frame      |              |
+    +================+=======+=========+================+==============+
+    | Quantised      | 16 KB | 152 KB  | 6.4 ms         | 32 ms        |
+    | WakeNet10 @ 3  |       |         |                |              |
+    | channel        |       |         |                |              |
+    +----------------+-------+---------+----------------+--------------+
+
+    .. note::
+
+        WakeNet10 3-channel results use ``DET_MODE_3CH_90`` as the default detection mode. CPU loading (1 core): 19.9%.
 
 Performance Test
 ~~~~~~~~~~~~~~~~

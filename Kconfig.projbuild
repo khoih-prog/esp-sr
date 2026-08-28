@@ -76,16 +76,24 @@ endmenu
 menu "Load Multiple Wake Words (WakeNet9 or WakeNet10)"
     depends on IDF_TARGET_ESP32S3 ||  IDF_TARGET_ESP32P4 ||  IDF_TARGET_ESP32S31
 
-    config SR_WN_WN10_HILEXIN
-    bool "Hi,乐鑫 (wn10_hilexin)"
+    config SR_WN_WN10_HILEXIN_INT16
+    bool "Hi,乐鑫 (wn10_hilexin_int16)"
     default n
 
     config SR_WN_WN10_XIAOAITONGXUE
     bool "小爱同学 (wn10_xiaoaittongxue)"
     default n
 
+    config SR_WN_WN10_XIAOAITONGXUE_INT16
+    bool "小爱同学 (wn10_xiaoaittongxue_int16)"
+    default n
+
     config SR_WN_WN10_NIHAOXIAOZHI
     bool "你好小智 (wn10_nihaoxiaozhi)"
+    default n
+
+    config SR_WN_WN10_NIHAOXIAOZHI_INT16
+    bool "你好小智 (wn10_nihaoxiaozhi_int16)"
     default n
 
     config SR_WN_WN9_HILEXIN
@@ -94,6 +102,10 @@ menu "Load Multiple Wake Words (WakeNet9 or WakeNet10)"
 
     config SR_WN_WN9_HIESP
     bool "Hi,ESP (wn9_hiesp)"
+    default n
+
+    config SR_WN_WN10_MOSAICO 
+    bool "Moscaico (wn10_moscaico)"
     default n
 
     config SR_WN_WN9L_JA_KONNICHIHAESP_TTS3
