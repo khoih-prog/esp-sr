@@ -21,7 +21,8 @@ These algorithms are provided in the form of a component, so they can be integra
 
 News
 ----
-- [2026/08/17]: We have released the new WakeNet10 model and optimized the TTS pipeline to improve the final model's generalization performance. WakeNet10 is currently available in INT16 quantization, with an INT8-quantized version planned for a future release.
+- [2026/08/28]: We added the [GSC beamforming algorithm](https://docs.espressif.com/projects/esp-sr/en/latest/esp32p4/gsc_beamforming/README.html) and updated the [DOA algorithm](https://docs.espressif.com/projects/esp-sr/en/latest/esp32p4/direction_of_arrival/README.html).
+- [2026/08/17]: We have released the new WakeNet10 model and optimized the TTS pipeline to improve the final model's generalization performance. WakeNet10 is currently available in w16a16 and w8a16(default) quantization by [esp-dl](https://github.com/espressif/esp-dl).
 - [2026/05/09]: Preliminary support for ESP32-S31 target.
 - [2026/04/28]: We update a new AEC algorithm for full-duplex scenarios. For performance evaluation and usage instructions, please refer to the [documentation](https://docs.espressif.com/projects/esp-sr/en/latest/esp32s3/acoustic_echo_cancellation/README.html).
 - [2026/04/23]: TTS Pipeline V3 now supports wake word training for Chinese, English, Japanese, and French. Planned support includes Korean, Spanish, Portuguese, German, Russian, and Arabic.
@@ -95,3 +96,4 @@ Our two-mic Audio Front-End (AFE) have been qualified as a “Software Audio Fro
 - Examples: [esp-skainet/examples](https://github.com/espressif/esp-skainet)
 - Fbank/MFCC: [esp-dl/audio](https://github.com/espressif/esp-dl/tree/master/esp-dl/audio)
 - FFT: [dl_fft](https://components.espressif.com/components/espressif/dl_fft/versions/0.3.1/readme)
+- AI inference framework: [esp-dl](https://github.com/espressif/esp-dl)

@@ -21,10 +21,12 @@
 #include "gsc_core_types.h"
 
 /* Memory placement:
- * - The DOA internal buffers (memory pool, ~200KB for 4 mics) are allocated
- *   in PSRAM by default. To place them in internal RAM instead, define
- *   ESP_DOA_DISABLE_PSRAM before including this header (or as a compile
- *   definition of the esp_audio_processor component). */
+ * - Per-frame hot buffers (~57KB for 4 mics) are always allocated in
+ *   internal RAM; the large read-only steering-vector tables (~149KB for
+ *   4 mics) are allocated in PSRAM by default. To place everything in
+ *   internal RAM instead, define ESP_DOA_DISABLE_PSRAM before including
+ *   this header (or as a compile definition of the esp_audio_processor
+ *   component). */
 #ifndef ESP_DOA_DISABLE_PSRAM
 #define ESP_DOA_PSRAM_DEFAULT
 #endif
@@ -33,6 +35,27 @@
 extern "C" {
 #endif
 
+/* Default frequency band for the Capon spectrum, used by
+ * esp_doa_capon_embedded_create(). To configure the band at runtime, use
+ * esp_doa_capon_embedded_create_with_band() instead - these macros only
+ * provide the defaults (and may be overridden via compile definitions).
+ * The defaults are optimized for far-field speech with a ~5 cm radius array.
+ * Band selection guidance (c = 340 m/s):
+ *   - f >= c/(2*array_aperture)   for useful directivity
+ *   - f <  c/(2*min_mic_spacing)  to avoid grating lobes */
+#ifndef DOA_LOW_FREQ
+#define DOA_LOW_FREQ          1500    /* Hz */
+#endif
+#ifndef DOA_HIGH_FREQ
+#define DOA_HIGH_FREQ         4500    /* Hz */
+#endif
+#ifndef DOA_FREQ_SPACING
+#define DOA_FREQ_SPACING      100     /* Hz */
+#endif
+
+/* Derived: number of frequency bins used with the default band */
+#define DOA_FREQ_BIN_NUM      ((DOA_HIGH_FREQ - DOA_LOW_FREQ) / DOA_FREQ_SPACING + 1)
+
 /*
  * ESP DOA Capon Embedded - Optimized for ESP32-P4
  *
@@ -40,16 +63,17 @@ extern "C" {
  * direction-of-arrival (DOA) estimation algorithm.
  *
  * Features:
- *   - Optimized for real-time processing (~1.7ms/frame on ESP32-P4 @ 400MHz, 4 mics)
+ *   - Optimized for real-time processing (~0.65ms/frame on ESP32-P4 @ 400MHz, 4 mics)
  *   - Arbitrary microphone array geometry (runtime mic coordinates)
  *   - Frame size: 128 samples, FFT size: 256
- *   - Frequency range: 1500-4500 Hz (speech optimized)
+ *   - Frequency range: 1500-4500 Hz by default (speech optimized),
+ *     configurable at runtime via esp_doa_capon_embedded_create_with_band()
  *   - Angle resolution: 10 degrees (36 angles: 0°, 10°, ..., 350°)
  *   - Single precision floating point only
  *   - Zero dynamic memory allocation during processing
  *
  * Performance comparison (4-mic circular array, ESP32-P4 @ 400MHz):
- *   - This embedded version: ~1.7ms/frame, ~201KB memory
+ *   - This embedded version: ~0.65ms/frame, ~57KB internal RAM + ~149KB PSRAM
  *   - Official esp_doa_capon: ~13ms/frame, 710KB memory (default config)
  *
  * Use case: Real-time speech source localization on ESP32-P4
@@ -64,7 +88,8 @@ typedef struct esp_doa_capon_embedded_handle_t esp_doa_capon_embedded_handle_t;
  * embedded optimized configuration. Fixed processing parameters:
  *   - Frame size: 128 samples at 16kHz (8ms frame shift)
  *   - FFT size: 256 points
- *   - Processing bandwidth: 1500-4500 Hz (speech optimized)
+ *   - Processing bandwidth: 1500-4500 Hz by default (speech optimized),
+ *     configurable at runtime via esp_doa_capon_embedded_create_with_band()
  *   - Angle resolution: 10 degrees (36 angles from 0° to 350°)
  *
  * The microphone array geometry is arbitrary and given at runtime:
@@ -74,9 +99,10 @@ typedef struct esp_doa_capon_embedded_handle_t esp_doa_capon_embedded_handle_t;
  *     at mic_coord[i] (shuffling is fine as long as the pairing holds)
  *   - When chaining DOA with esp_gsc, pass the SAME coordinate array to both
  *
- * All memory (handle + internal memory pool) is allocated by this function
- * and released by esp_doa_capon_embedded_destroy(). Buffers are allocated
- * from PSRAM by default (see ESP_DOA_DISABLE_PSRAM above).
+ * All memory (handle + both memory pools) is allocated by this function
+ * and released by esp_doa_capon_embedded_destroy(). Hot buffers come from
+ * internal RAM, steering tables from PSRAM by default (see
+ * ESP_DOA_DISABLE_PSRAM above).
  *
  * @param mic_coord Array of microphone coordinates (unit: meters),
  *                  right-hand coordinate system, one entry per microphone
@@ -99,6 +125,34 @@ typedef struct esp_doa_capon_embedded_handle_t esp_doa_capon_embedded_handle_t;
  * @endcode
  */
 esp_doa_capon_embedded_handle_t *esp_doa_capon_embedded_create(PlaneCoord *mic_coord, int mic_num);
+
+/**
+ * @brief Create DOA processor with a custom processing frequency band
+ *
+ * Same as esp_doa_capon_embedded_create(), but the band used for the Capon
+ * spectrum is configurable at runtime. Band selection guidance (c = 340 m/s):
+ *   - low_freq  >= c / (2 * array_aperture)    for useful directivity
+ *   - high_freq <= c / (2 * min_mic_spacing)   to avoid grating lobes
+ *
+ * @param mic_coord    Array of microphone coordinates (unit: meters)
+ * @param mic_num      Number of microphones (2 .. 8)
+ * @param low_freq     Lower band edge in Hz
+ * @param high_freq    Upper band edge in Hz
+ * @param freq_spacing Spacing between evaluated frequency bins in Hz
+ *
+ * @return Initialized handle on success, NULL on failure
+ *         Failure can occur if:
+ *         - mic_coord is NULL, mic_num is out of range, or allocation fails
+ *         - the band is invalid. Constraints:
+ *             0 < low_freq < high_freq <= 8000 (Nyquist at 16 kHz)
+ *             freq_spacing >= 63 Hz (FFT bin resolution is 62.5 Hz)
+ *             (high_freq - low_freq) / freq_spacing + 1 <= 129 bins
+ *
+ * Note: processing time scales linearly with the number of frequency bins.
+ */
+esp_doa_capon_embedded_handle_t *esp_doa_capon_embedded_create_with_band(
+        PlaneCoord *mic_coord, int mic_num,
+        int low_freq, int high_freq, int freq_spacing);
 
 /**
  * @brief Release all allocated resources
@@ -148,9 +202,9 @@ void esp_doa_capon_embedded_destroy(esp_doa_capon_embedded_handle_t *handle);
  *
  *         Returns -1.0f on error (handle is NULL, or internal error)
  * 
- * Processing time: ~1.7ms on ESP32-P4 @ 400MHz (4 mics)
+ * Processing time: ~0.65ms on ESP32-P4 @ 400MHz (4 mics)
  * Real-time budget: 8ms (for 128 samples @ 16kHz)
- * CPU usage: ~21% of real-time budget
+ * CPU usage: ~8% of real-time budget
  * 
  * Example:
  * @code

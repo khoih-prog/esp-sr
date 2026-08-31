@@ -1,5 +1,8 @@
 # Change log for esp-sr
 
+#2.5.2
+- Support w8a16 wakenet10
+- Improve DOA
 
 # 2.5.1
 - Add GSC module
