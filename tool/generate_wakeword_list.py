@@ -19,8 +19,11 @@ MODEL_INFO_PATTERN = re.compile(
 
 WAKE_WORD_ALIASES = {
     "Bonjourespfr": "Bonjour ESP",
+    "heyhermes": "Hey,Hermes",
+    "heynova": "Hey,Nova",
     "Konnichihaespja": "こんにちは ESP",
     "Linaiban": "璃奈板",
+    "mosaico": "Mosaico",
     "Ni3Hao3Xiao3Rui4": "你好小瑞",
     "Ni3Hao3Xiao3Zhi4": "你好小智",
     "Xiaoaitongxue": "小爱同学",
@@ -29,6 +32,7 @@ WAKE_WORD_ALIASES = {
     "嗨乐鑫": "Hi,乐鑫",
     "嗨，乐鑫": "Hi,乐鑫",
 }
+WAKE_WORD_ALIASES_NORM = {key.casefold(): value for key, value in WAKE_WORD_ALIASES.items()}
 
 
 def read_wake_word(model_dir: Path) -> str:
@@ -54,7 +58,7 @@ def read_wake_word(model_dir: Path) -> str:
         )
 
     wake_word = wake_words.pop()
-    return WAKE_WORD_ALIASES.get(wake_word, wake_word)
+    return WAKE_WORD_ALIASES_NORM.get(wake_word.casefold(), wake_word)
 
 
 def model_sort_key(item: Tuple[str, str]) -> Tuple[int, str, str]:

@@ -108,6 +108,14 @@ menu "Load Multiple Wake Words (WakeNet9 or WakeNet10)"
     bool "Moscaico (wn10_moscaico)"
     default n
 
+    config SR_WN_WN10_HEYHERMES
+    bool "Hey,Hermes (wn10_heyhermes)"
+    default n
+
+    config SR_WN_WN10_HEYNOVA
+    bool "Hey,Nova (wn10_heynova)"
+    default n
+
     config SR_WN_WN9L_JA_KONNICHIHAESP_TTS3
     bool "こんにちは ESP (wn9l_ja_konnichihaesp_tts3)"
     default n

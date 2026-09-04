@@ -92,8 +92,13 @@ There are two ways to load a wake word model:
 | Hi,Jason | `wn9s_hijason` |
 | Hi,乐鑫 | `wn9s_hilexin` |
 | 你好小智 | `wn9s_nihaoxiaozhi` |
-| Hi,乐鑫 | `wn10_hilexin` |
+| Hey,Hermes | `wn10_heyhermes` |
+| Hey,Nova | `wn10_heynova` |
+| Hi,乐鑫 | `wn10_hilexin_int16` |
+| Mosaico | `wn10_mosaico` |
 | 你好小智 | `wn10_nihaoxiaozhi` |
+| 你好小智 | `wn10_nihaoxiaozhi_int16` |
 | 小爱同学 | `wn10_xiaoaitongxue` |
+| 小爱同学 | `wn10_xiaoaitongxue_int16` |
 
-Generated at: 2026-08-17T17:20:45+08:00
+Generated at: 2026-09-04T14:37:37+08:00
