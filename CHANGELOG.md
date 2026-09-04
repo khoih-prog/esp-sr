@@ -1,6 +1,10 @@
 # Change log for esp-sr
 
-#2.5.2
+# 2.5.3
+- Fix wakenet10 memory bug
+- Update docs and add more wakenet10 models
+
+# 2.5.2
 - Support w8a16 wakenet10
 - Improve DOA
 
