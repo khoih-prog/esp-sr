@@ -17,6 +17,7 @@ ESP-SR User Guide
     Audio Front-end (AFE) <audio_front_end/index>
     Wake Word WakeNet <wake_word_engine/index>
     VAD Model vadnet <vadnet/README>
+    Noise Suppression NSNet <nsnet/README>
     Acoustic Echo Cancellation (AEC) <acoustic_echo_cancellation/README>
     Direction of Arrival (DOA) <direction_of_arrival/README>
     GSC Beamforming <gsc_beamforming/README>

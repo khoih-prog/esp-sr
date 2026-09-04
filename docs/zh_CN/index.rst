@@ -21,6 +21,7 @@ ESP-SR 用户指南
     GSC 波束形成 <gsc_beamforming/README>
     语音唤醒 WakeNet <wake_word_engine/index>
     VAD vadnet <vadnet/README>
+    噪声抑制 NSNet <nsnet/README>
     语音指令 MultiNet <speech_command_recognition/README>
     语音合成（仅支持中文）<speech_synthesis/readme>
     模型选择和加载 <flash_model/README>

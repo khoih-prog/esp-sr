@@ -1,5 +1,10 @@
 from esp_docs.conf_docs import *  # noqa: F403,F401
 
+from prepare_published_paths import prepare_published_paths
+
+# RST keeps published esp-sr paths; create them here so :project_file: checks pass.
+prepare_published_paths()
+
 languages = ['en', 'zh_CN']
 idf_targets = ['esp32', 'esp32s3', 'esp32p4', 'esp32s31']
 

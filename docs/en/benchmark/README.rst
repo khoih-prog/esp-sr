@@ -264,14 +264,14 @@ Resource Consumption
     | WakeNet9 @ 3   |       |         |                |              |
     | channel        |       |         |                |              |
     +----------------+-------+---------+----------------+--------------+
-    | Quantised      | 16 KB | 148 KB  | 7.1 ms         | 32 ms        |
+    | Quantised      | 17 KB | 523 KB  | 7.1 ms         | 32 ms        |
     | WakeNet10 @ 3  |       |         |                |              |
     | channel        |       |         |                |              |
     +----------------+-------+---------+----------------+--------------+
 
     .. note::
 
-        WakeNet10 3-channel results use ``DET_MODE_3CH_90`` as the default detection mode. CPU loading (1 core): 22.3%.
+        WakeNet10 3-channel results use ``DET_MODE_3CH_90`` as the default detection mode. CPU loading (1 core): 22.6%.
 
 .. only:: esp32p4
 
@@ -288,14 +288,14 @@ Resource Consumption
     | WakeNet9 @ 3   |       |         |                |              |
     | channel        |       |         |                |              |
     +----------------+-------+---------+----------------+--------------+
-    | Quantised      | 16 KB | 153 KB  | 4.1 ms         | 32 ms        |
+    | Quantised      | 16 KB | 523 KB  | 4.1 ms         | 32 ms        |
     | WakeNet10 @ 3  |       |         |                |              |
     | channel        |       |         |                |              |
     +----------------+-------+---------+----------------+--------------+
 
     .. note::
 
-        WakeNet10 3-channel results use ``DET_MODE_3CH_90`` as the default detection mode. CPU loading (1 core): 12.9%.
+        WakeNet10 3-channel results use ``DET_MODE_3CH_90`` as the default detection mode. CPU loading (1 core): 14.1%.
 
 .. _resource-occupancyesp32s31-1:
 
@@ -306,7 +306,7 @@ Resource Consumption
     |                |       |         | Running Time   |              |
     |                |       |         | per Frame      |              |
     +================+=======+=========+================+==============+
-    | Quantised      | 16 KB | 152 KB  | 6.4 ms         | 32 ms        |
+    | Quantised      | 16 KB | 523 KB  | 6.4 ms         | 32 ms        |
     | WakeNet10 @ 3  |       |         |                |              |
     | channel        |       |         |                |              |
     +----------------+-------+---------+----------------+--------------+

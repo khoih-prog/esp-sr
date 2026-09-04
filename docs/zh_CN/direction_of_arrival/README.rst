@@ -17,7 +17,7 @@ ESP-SR DOA（Direction of Arrival，声源定向）模块用于估计声源相�
 - 支持任意阵列几何形状：2 至 8 个麦克风，麦克风坐标在运行时配置
 - 帧长：16 kHz 采样率下每通道 128 个采样点（每帧 8 ms）
 - FFT 点数：256
-- 处理频带：1500–4500 Hz（针对语音优化）
+- 处理频带：默认 1500–4500 Hz（针对语音优化）；可通过 ``esp_doa_capon_embedded_create_with_band()`` 在运行时配置（见下文 **自定义处理频带** 一节），默认频带也可通过 ``DOA_LOW_FREQ`` / ``DOA_HIGH_FREQ`` / ``DOA_FREQ_SPACING`` 宏在编译时覆盖
 - 角度分辨率：10 度（36 个候选角度：0°、10°、…、350°）
 - 仅使用单精度浮点运算
 - 处理过程中零动态内存分配（所有缓冲区在创建时预分配）
@@ -95,16 +95,50 @@ ESP-SR DOA（Direction of Arrival，声源定向）模块用于估计声源相�
 
    ``esp_doa_capon_embedded_print_info(doa)`` 可打印处理器配置（帧长、FFT 点数、处理频带等），用于调试。
 
+自定义处理频带
+----------------
+
+默认情况下，Capon 空间谱在 1500–4500 Hz 范围内以 100 Hz 间隔（31 个频点）计算。如需在运行时调整频带，请使用 ``esp_doa_capon_embedded_create_with_band()`` 代替 ``esp_doa_capon_embedded_create()`` 创建实例：
+
+.. code-block:: c
+
+   esp_doa_capon_embedded_handle_t *doa =
+       esp_doa_capon_embedded_create_with_band(mic_coords, 4,
+                                               2000,  /* low_freq (Hz) */
+                                               6000,  /* high_freq (Hz) */
+                                               200);  /* freq_spacing (Hz) */
+
+频带在创建时校验，违反以下任一约束时返回 ``NULL``：
+
+- ``0 < low_freq < high_freq <= 8000`` （16 kHz 采样率下的奈奎斯特频率）
+- ``freq_spacing >= 63`` Hz（FFT 频点分辨率为 62.5 Hz）
+- ``(high_freq - low_freq) / freq_spacing + 1 <= 129`` 个频点
+
+频带选择指导（声速 c = 340 m/s）：
+
+- ``low_freq >= c / (2 * 阵列孔径)``，保证有效的指向性
+- ``high_freq <= c / (2 * 最小麦克风间距)``，避免栅瓣
+
+.. note::
+
+   处理时间与参与计算的频点数量成线性关系。
+
+``esp_doa_capon_embedded_create()`` 使用的默认频带也可在编译时通过定义 ``DOA_LOW_FREQ`` 、 ``DOA_HIGH_FREQ`` 和 ``DOA_FREQ_SPACING`` （例如作为编译选项）修改。
+
 内存配置
 --------
 
-- 在 ESP32-P4 上，DOA 内部缓冲区（内存池，4 麦约 200 KB）默认分配在 PSRAM 中。
-- 如需改用内部 RAM，可在包含 ``esp_doa_capon_embedded.h`` 之前定义 ``ESP_DOA_DISABLE_PSRAM``，或将其作为编译选项定义。
+- 在 ESP32-P4 上，DOA 内存池分为两部分（4 麦共约 206 KB）：
+
+  - 每帧热缓冲（约 57 KB）始终分配在内部 RAM 中，以保证访问速度；
+  - 只读的导向矢量表（约 149 KB）默认分配在 PSRAM 中。
+
+- 如需全部改用内部 RAM，可在包含 ``esp_doa_capon_embedded.h`` 之前定义 ``ESP_DOA_DISABLE_PSRAM``，或将其作为编译选项定义。
 
 精度测试
 --------
 
-测试程序 ``test_apps/esp-sr-gsc-doa`` 在芯片端评估 DOA 估计精度。测试数据集为仿真的 4 麦均匀圆阵（半径 5 cm）纯净语音，声源位于半径 2 m 的圆周上，角度从 0° 到 330°、步进 30°（从 +x 轴逆时针计量）。
+测试程序 ``test_apps/esp-sr-gsc-doa`` 在芯片端评估 DOA 估计精度。测试数据集 ``data_4mic_r5cm_quite`` 为仿真的 4 麦均匀圆阵（半径 5 cm）纯净语音，声源位于半径 2 m 的圆周上，角度从 0° 到 330°、步进 30°（从 +x 轴逆时针计量）。
 
 测试方法：
 
@@ -122,10 +156,10 @@ ESP-SR DOA（Direction of Arrival，声源定向）模块用于估计声源相�
      - 结果
      - 说明
    * - 完全命中率
-     - 94.0% (609/648)
+     - 100% (648/648)
      - 估计角度与真实角度完全一致
    * - ±10° 内准确率
-     - 94.0% (609/648)
+     - 100% (648/648)
      - 误差在一个网格步长以内
 
 资源消耗
@@ -145,10 +179,10 @@ ESP-SR DOA（Direction of Arrival，声源定向）模块用于估计声源相�
         - 每帧耗时 (ms)
         - CPU 占用 (%)
       * - 4
-        - 1.8
-        - 204.3
-        - 1.76 / 8
-        - 22.0
+        - 57
+        - 149
+        - 0.65 / 8
+        - 8.1
 
     .. note::
 
