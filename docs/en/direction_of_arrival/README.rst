@@ -17,7 +17,7 @@ The embedded DOA module has the following features:
 - Arbitrary microphone array geometry: any array shape with 2 to 8 microphones, microphone coordinates are configured at runtime
 - Frame size: 128 samples per channel at 16 kHz (8 ms per frame)
 - FFT size: 256 points
-- Processing bandwidth: 1500–4500 Hz (optimized for speech)
+- Processing bandwidth: 1500–4500 Hz by default (optimized for speech); the band is configurable at runtime via ``esp_doa_capon_embedded_create_with_band()`` (see **Custom Frequency Band** below), and the default band can be overridden at compile time via the ``DOA_LOW_FREQ`` / ``DOA_HIGH_FREQ`` / ``DOA_FREQ_SPACING`` macros
 - Angle resolution: 10 degrees (36 candidate angles: 0°, 10°, ..., 350°)
 - Single precision floating point only
 - Zero dynamic memory allocation during processing (all buffers are pre-allocated at creation)
@@ -95,16 +95,50 @@ The header file is :project_file:`include/esp32p4/esp_doa_capon_embedded.h`.
 
    ``esp_doa_capon_embedded_print_info(doa)`` prints the processor configuration (frame size, FFT size, frequency range, etc.) for debugging.
 
+Custom Frequency Band
+---------------------
+
+By default, the Capon spectrum is evaluated over 1500–4500 Hz with 100 Hz spacing (31 bins). To tune the band at runtime, create the instance with ``esp_doa_capon_embedded_create_with_band()`` instead of ``esp_doa_capon_embedded_create()``:
+
+.. code-block:: c
+
+   esp_doa_capon_embedded_handle_t *doa =
+       esp_doa_capon_embedded_create_with_band(mic_coords, 4,
+                                               2000,  /* low_freq (Hz) */
+                                               6000,  /* high_freq (Hz) */
+                                               200);  /* freq_spacing (Hz) */
+
+The band is validated at creation time; ``NULL`` is returned if any of the following constraints is violated:
+
+- ``0 < low_freq < high_freq <= 8000`` (Nyquist at 16 kHz)
+- ``freq_spacing >= 63`` Hz (the FFT bin resolution is 62.5 Hz)
+- ``(high_freq - low_freq) / freq_spacing + 1 <= 129`` frequency bins
+
+Band selection guidance (speed of sound c = 340 m/s):
+
+- ``low_freq >= c / (2 * array_aperture)`` for useful directivity
+- ``high_freq <= c / (2 * min_mic_spacing)`` to avoid grating lobes
+
+.. note::
+
+   Processing time scales linearly with the number of evaluated frequency bins.
+
+The default band used by ``esp_doa_capon_embedded_create()`` can also be changed at compile time by defining ``DOA_LOW_FREQ``, ``DOA_HIGH_FREQ`` and ``DOA_FREQ_SPACING`` (e.g., as compile definitions).
+
 Memory Configuration
 --------------------
 
-- On ESP32-P4, the DOA internal buffers (memory pool, about 200 KB for 4 microphones) are allocated in PSRAM by default.
-- To place them in internal RAM instead, define ``ESP_DOA_DISABLE_PSRAM`` before including ``esp_doa_capon_embedded.h`` (or as a compile definition).
+- On ESP32-P4, the DOA memory pool is split into two parts (about 206 KB in total for 4 microphones):
+
+  - Per-frame hot buffers (about 57 KB) are always allocated in internal RAM for fast access.
+  - The large read-only steering-vector tables (about 149 KB) are allocated in PSRAM by default.
+
+- To place everything in internal RAM instead, define ``ESP_DOA_DISABLE_PSRAM`` before including ``esp_doa_capon_embedded.h`` (or as a compile definition).
 
 Accuracy Evaluation
 -------------------
 
-The test application ``test_apps/esp-sr-gsc-doa`` evaluates the DOA estimation accuracy on chip. The test dataset is a simulated 4-mic uniform circular array (radius 5 cm) with clean speech; the sound source is placed on a 2 m circle at angles 0° to 330° in 30° steps (counter-clockwise from the +x axis).
+The test application ``test_apps/esp-sr-gsc-doa`` evaluates the DOA estimation accuracy on chip. The test dataset ``data_4mic_r5cm_quite`` is a simulated 4-mic uniform circular array (radius 5 cm) with clean speech; the sound source is placed on a 2 m circle at angles 0° to 330° in 30° steps (counter-clockwise from the +x axis).
 
 Test method:
 
@@ -122,10 +156,10 @@ Test results:
      - Result
      - Note
    * - Exact match rate
-     - 94.0% (609/648)
+     - 100% (648/648)
      - Estimated angle equals the true angle
    * - Accuracy within ±10°
-     - 94.0% (609/648)
+     - 100% (648/648)
      - Error within one grid step
 
 Resource Consumption
@@ -145,10 +179,10 @@ The following table shows typical resource usage and performance data (16 kHz sa
         - Time per Frame (ms)
         - CPU Usage (%)
       * - 4
-        - 1.8
-        - 204.3
-        - 1.76 / 8
-        - 22.0
+        - 57
+        - 149
+        - 0.65 / 8
+        - 8.1
 
     .. note::
 
